@@ -1,0 +1,30 @@
+package com.korit.security_study.security.model;
+
+import com.korit.security_study.entity.UserRole;
+import lombok.Builder;
+import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Data
+@Builder
+public class Principal implements UserDetails {
+    private Integer userId;
+    private String username;
+    private String password;
+    private String email;
+
+    private List<UserRole> userRoles;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return userRoles.stream().map(
+                userRole -> new SimpleGrantedAuthority(userRole.getRole().getRoleName())
+        ).collect(Collectors.toList());
+    }
+}
