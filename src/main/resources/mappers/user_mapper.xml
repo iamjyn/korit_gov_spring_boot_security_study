@@ -78,5 +78,37 @@
         where
             ut.user_id = #{userId};
     </select>
+    <update id="updatePassword">
+        update
+            user_tb
+        set
+            password = #{password},
+            update_dt = now()
+        where
+            user_id = #{userId};
+    </update>
 
+    <select id="getUserByEmail" resultMap="UserResultMap">
+        select
+            ut.user_id,
+            ut.username,
+            ut.password,
+            ut.email,
+            ut.create_dt,
+            ut.update_dt,
+
+            urt.user_role_id,
+            urt.user_id AS urt_user_id,
+            urt.role_id AS urt_role_id,
+
+            rt.role_id,
+            rt.role_name,
+            rt.role_name_kor
+        from
+            user_tb ut
+            join user_role_tb urt on(ut.user_id = urt.user_id)
+            join role_tb rt on(rt.role_id = urt.role_id)
+        where
+            ut.email = #{email};
+    </select>
 </mapper>

@@ -18,6 +18,10 @@ public class UserRepository {
         return userMapper.getUserByUsername(username);
     }
 
+    public Optional<User> getUserByEmail(String email) {
+        return userMapper.getUserByEmail(email);
+    }
+
     public Optional<User> getUserByUserId(Integer userId) {
         return userMapper.getUserByUserId(userId);
     }
@@ -31,6 +35,7 @@ public class UserRepository {
         return Optional.of(user);
     }
 
-
-
+    public int updatePassword(User user) {
+        return userMapper.updatePassword(user);
+    }
 }

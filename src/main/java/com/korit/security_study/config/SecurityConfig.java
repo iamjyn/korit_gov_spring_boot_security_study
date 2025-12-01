@@ -1,6 +1,8 @@
 package com.korit.security_study.config;
 
 import com.korit.security_study.security.filter.JwtAuthenticationFilter;
+import com.korit.security_study.security.handler.OAuth2SuccessHandler;
+import com.korit.security_study.service.OAuth2PrincipalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,6 +21,12 @@ public class SecurityConfig {
 
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Autowired
+    private OAuth2PrincipalService oAuth2PrincipalService;
+
+    @Autowired
+    private OAuth2SuccessHandler oAuth2SuccessHandler;
 
     /*
     * BCryptPasswordEncoder
@@ -70,6 +78,7 @@ public class SecurityConfig {
         http.httpBasic(httpBasic -> httpBasic.disable());
         // 서버 사이드 렌더링 로그아웃 방식 비활성화
         http.logout(logout -> logout.disable());
+
         // 세션의 무상태 방식 사용
         http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
@@ -78,11 +87,21 @@ public class SecurityConfig {
 
         // 특정 요청 URL에 대한 권한 설정
         http.authorizeHttpRequests(auth -> {
-            auth.requestMatchers("/auth/signup", "/auth/signin").permitAll();
+            auth.requestMatchers("/auth/signup", "/auth/signin", "/login/oauth2/**", "/oauth2/**").permitAll();
             auth.anyRequest().authenticated();
         });
 
-        // OAuth2 설정
+        // 요청이 들어오면 Spring Security의 filterChain을 탄다
+        // 여기서 여러 필터 중 하나가 OAuth2 요청을 감지
+        // 감지되면 해당 provider의 로그인 페이지로 리디렉션함
+        http.oauth2Login(oauth2 ->
+                // OAuth2 로그인 요청이 성공하고 사용자 정보를 가져오는 과정을 설정
+                oauth2.userInfoEndpoint(userInfo ->
+                        // 사용자 정보 요청이 완료가 되면 이 커스텀 서비스로 OAuth2User 객체에 대한 처리를 하겠다고 설정
+                        userInfo.userService(oAuth2PrincipalService))
+                        // 사용자 정보 파싱이 끝난 후에 실행할 핸들러 설정
+                        .successHandler(oAuth2SuccessHandler)
+        );
 
         return http.build();
     }

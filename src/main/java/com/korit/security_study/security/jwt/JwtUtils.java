@@ -51,5 +51,4 @@ public class JwtUtils {
     public String removeBearer(String bearerToken) {
         return bearerToken.replaceFirst("Bearer ", "");
     }
-
 }
