@@ -67,6 +67,4 @@ public class AuthService {
         }
         return new ApiRespDto<>("success", "회원 조회 완료", foundUser.get());
     }
-
-
 }

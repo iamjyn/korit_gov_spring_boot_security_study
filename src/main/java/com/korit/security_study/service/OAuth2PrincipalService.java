@@ -37,9 +37,15 @@ public class OAuth2PrincipalService extends DefaultOAuth2UserService {
                 email = (String) attributes.get("email");
                 break;
             case "naver":
+                Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+                providerUserId = response.get("id").toString();
+                email = (String) response.get("email");
                 break;
-            case "kakao":
-                break;
+//            case "kakao":
+//                providerUserId = attributes.get("id").toString();
+//                Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+//                email = (String) kakaoAccount.get("email");
+//                break;
         }
 
         Map<String, Object> newAttributes = Map.of(

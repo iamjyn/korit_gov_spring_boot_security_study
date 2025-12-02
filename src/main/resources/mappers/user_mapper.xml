@@ -15,8 +15,8 @@
 
     <resultMap id="UserRoleResultMap" type="com.korit.security_study.entity.UserRole">
         <id property="userRoleId" column="user_role_id" />
-        <result property="userId" column="urt.user_id" />
-        <result property="roleId" column="urt.role_id" />
+        <result property="userId" column="urt_user_id" />
+        <result property="roleId" column="urt_role_id" />
         <association property="role" resultMap="RoleResultMap" />
     </resultMap>
 

@@ -1,6 +1,7 @@
 package com.korit.security_study.service;
 
 import com.korit.security_study.dto.ApiRespDto;
+import com.korit.security_study.dto.OAuth2MergeReqDto;
 import com.korit.security_study.dto.OAuth2SignupReqDto;
 import com.korit.security_study.entity.User;
 import com.korit.security_study.entity.UserRole;
@@ -49,6 +50,19 @@ public class OAuth2AuthService {
         userRoleRepository.addUserRole(userRole);
         oAuth2UserRepository.addOAuth2User(oAuth2SignupReqDto.toOAuth2UserEntity(optionalUser.get().getUserId()));
         return new ApiRespDto<>("success", oAuth2SignupReqDto.getProvider() + "로 회원가입 완료", null);
+    }
+
+    public ApiRespDto<?> merge(OAuth2MergeReqDto oAuth2MergeReqDto) {
+        Optional<User> foundUser = userRepository.getUserByUsername(oAuth2MergeReqDto.getUsername());
+        if (foundUser.isEmpty()) {
+            return new ApiRespDto<>("failed", "사용자 정보가 일치하지 않습니다.", null);
+        }
+        if (!bCryptPasswordEncoder.matches(oAuth2MergeReqDto.getPassword(), foundUser.get().getPassword())) {
+            return new ApiRespDto<>("failed", "사용자 정보가 일치하지 않습니다.", null);
+        }
+
+        oAuth2UserRepository.addOAuth2User(oAuth2MergeReqDto.toEntity(foundUser.get().getUserId()));
+        return new ApiRespDto<>("success", "연동 완료", null);
     }
 
 }
